@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+//just a test
 /**
  * klasa panelu, w nim deklaracja tablicy klasy myRec,
  * przechowujacej obiekty dziedziczace po klasie Rectangle2D.Double
