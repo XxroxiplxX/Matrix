@@ -15,7 +15,8 @@ public class myRec extends Rectangle2D.Double implements Runnable {
     int infimum;
     int coordn, coordm;
     Panel panel;
-    public myMonitor monitor;
+    public final myMonitor monitor;
+    private final Object locker;
     Random generator = new Random();
     Thread t;
 
@@ -35,8 +36,9 @@ public class myRec extends Rectangle2D.Double implements Runnable {
      * @param panel panel, do ktorego przypisany jest obiekt
      * @param monitor monitor, ktory dla danego watku wywoluje odpowiednie metody
      */
-    public myRec(double x, double y, double width, double height, int k, double p, int coordn, int coordm, Panel panel, myMonitor monitor){
+    public myRec(double x, double y, double width, double height, int k, double p, int coordn, int coordm, Panel panel, myMonitor monitor, Object locker){
         super(x,y,width,height);
+        this.locker = locker;
         /**
          * Utworzenie watku, jako pola w obiekcie myRec.
          */
@@ -81,7 +83,7 @@ public class myRec extends Rectangle2D.Double implements Runnable {
      * w obsludze wyjatkow, symulacja poczatkowo przybiera czarny kolor
      */
     @Override
-    public synchronized void run() {
+    public void run() {
         while(true){
             speed = generator.nextDouble();
             speed += 0.5;
@@ -95,54 +97,58 @@ public class myRec extends Rectangle2D.Double implements Runnable {
                 }
             }
             if(proba <= probability) {
-                r = generator.nextInt(225);
-                g = generator.nextInt(255);
-                b = generator.nextInt(255);
+                synchronized (monitor) {
+                    r = generator.nextInt(225);
+                    g = generator.nextInt(255);
+                    b = generator.nextInt(255);
+                }
 
             }
             else{
-                int a,x,c,d;
-                try {
-                    a = panel.board[(coordn + 1) % panel.n][(coordm) % panel.m].r;
-                    x = panel.board[(coordn) % panel.n][(coordm + 1) % panel.m].r;
-                    c = panel.board[(coordn + panel.n - 1) % panel.n][(coordm) % panel.m].r;
-                    d = panel.board[(coordn) % panel.n][(coordm + panel.m - 1) % panel.m].r;
-                }catch(NullPointerException e){
-                    // System.out.println(coordm + " " + coordn);
-                    a = 0;
-                    x = 0;
-                    c = 0;
-                    d = 0;
-                }
-                r = averagre4(a,x,c,d);
+                synchronized (monitor) {
+                    int a,x,c,d;
+                    try {
+                        a = panel.board[(coordn + 1) % panel.n][(coordm) % panel.m].r;
+                        x = panel.board[(coordn) % panel.n][(coordm + 1) % panel.m].r;
+                        c = panel.board[(coordn + panel.n - 1) % panel.n][(coordm) % panel.m].r;
+                        d = panel.board[(coordn) % panel.n][(coordm + panel.m - 1) % panel.m].r;
+                    }catch(NullPointerException e){
+                        // System.out.println(coordm + " " + coordn);
+                        a = 0;
+                        x = 0;
+                        c = 0;
+                        d = 0;
+                    }
+                    r = averagre4(a,x,c,d);
 
-                try {
-                    a = panel.board[(coordn + 1) % panel.n][(coordm) % panel.m].g;
-                    x = panel.board[(coordn) % panel.n][(coordm + 1) % panel.m].g;
-                    c = panel.board[(coordn + panel.n - 1) % panel.n][(coordm) % panel.m].g;
-                    d = panel.board[(coordn) % panel.n][(coordm + panel.m - 1) % panel.m].g;
-                }catch(NullPointerException e){
-                    // System.out.println(coordm + " " + coordn);
-                    a = 0;
-                    x = 0;
-                    c = 0;
-                    d = 0;
-                }
-                g = averagre4(a,x,c,d);
+                    try {
+                        a = panel.board[(coordn + 1) % panel.n][(coordm) % panel.m].g;
+                        x = panel.board[(coordn) % panel.n][(coordm + 1) % panel.m].g;
+                        c = panel.board[(coordn + panel.n - 1) % panel.n][(coordm) % panel.m].g;
+                        d = panel.board[(coordn) % panel.n][(coordm + panel.m - 1) % panel.m].g;
+                    }catch(NullPointerException e){
+                        // System.out.println(coordm + " " + coordn);
+                        a = 0;
+                        x = 0;
+                        c = 0;
+                        d = 0;
+                    }
+                    g = averagre4(a,x,c,d);
 
-                try {
-                    a = panel.board[(coordn + 1) % panel.n][(coordm) % panel.m].b;
-                    x = panel.board[(coordn) % panel.n][(coordm + 1) % panel.m].b;
-                    c = panel.board[(coordn + panel.n - 1) % panel.n][(coordm) % panel.m].b;
-                    d = panel.board[(coordn) % panel.n][(coordm + panel.m - 1) % panel.m].b;
-                }catch(NullPointerException e){
-                    // System.out.println(coordm + " " + coordn);
-                    a = 0;
-                    x = 0;
-                    c = 0;
-                    d = 0;
+                    try {
+                        a = panel.board[(coordn + 1) % panel.n][(coordm) % panel.m].b;
+                        x = panel.board[(coordn) % panel.n][(coordm + 1) % panel.m].b;
+                        c = panel.board[(coordn + panel.n - 1) % panel.n][(coordm) % panel.m].b;
+                        d = panel.board[(coordn) % panel.n][(coordm + panel.m - 1) % panel.m].b;
+                    }catch(NullPointerException e){
+                        // System.out.println(coordm + " " + coordn);
+                        a = 0;
+                        x = 0;
+                        c = 0;
+                        d = 0;
+                    }
+                    b = averagre4(a,x,c,d);
                 }
-                b = averagre4(a,x,c,d);
 
             }
             panel.repaint();

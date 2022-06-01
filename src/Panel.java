@@ -22,6 +22,8 @@ public class Panel extends JPanel {
      * Wspolrzedna y pierwszego kwadratu.
      */
     double y = 0;
+
+    private final Object locker;
     int n;
     int m;
     int k;
@@ -38,6 +40,7 @@ public class Panel extends JPanel {
      * @param d wielkosc kwadratu
      */
     public Panel(int n, int m, int k, double p, int d){
+        locker = new Object();
         this.n = n;
         this.m = m;
         this.k = k;
@@ -50,7 +53,7 @@ public class Panel extends JPanel {
         for(int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 if(x == n*d) {x = 0;}
-                this.board[j][i] = new myRec(x, y, d, d, k, p, j, i, this, new myMonitor());
+                this.board[j][i] = new myRec(x, y, d, d, k, p, j, i, this,new myMonitor() ,locker);
                 x += d;
             }
             y += d;
